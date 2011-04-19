@@ -1,0 +1,32 @@
+application: metofficewatch
+version: 1
+runtime: python
+api_version: 1
+
+handlers:
+- url: /css
+  static_dir: css
+
+- url: /images
+  static_dir: images
+  
+- url: /js
+  static_dir: js
+
+- url: /(.*)\.(html|txt)
+  static_files: statics/\1.\2 
+  upload: statics/(.*)
+
+- url: /mapreduce(/.*)?
+  script: mapreduce/main.py
+  login: admin
+
+- url: /admin(/.*)?
+  script: admin/main.py
+  login: admin
+
+- url: .*
+  script: main.py
+  
+builtins:
+- datastore_admin: on

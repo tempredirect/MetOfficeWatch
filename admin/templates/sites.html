@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}Jobs{% endblock %}
+{% block main %}
+<h2>Sites</h2>
+<a href="/admin/forecast/update">Update all forecasts</a>
+<table class="sites">
+    <thead>
+    <tr>
+        <th>id</th>
+        <th>name</th>
+        <th>location</th>
+        <th>update</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for  site in sites %}
+    <tr>
+        <td>{{site.key().id_or_name()}}</td>
+        <td>{{site.name}}</td>
+        <td>{{site.location}}</td>
+        <td>
+            <a href="#forecast" data-id="{{site.key().id_or_name()}}" class="forecast">forecast</a> |
+            <a href="#observations" data-id="{{site.key().id_or_name()}}" class="observation"></a>
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
+{% block footer %}-----{% endblock %}
+
+{% block last %}
+<script type="text/javascript">
+    $(function(){
+        $('table.sites a.forecast').click(function(e){
+            var id = $(this).attr("data-id");
+            $.ajax({
+                url:"/admin/forecast/" + id + "/update",
+                method:'POST',
+                success:function(){
+                    alert("Done");
+                }
+            });
+            e.preventDefault();
+        });
+    })
+</script>
+{% endblock %}

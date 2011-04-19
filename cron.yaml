@@ -1,0 +1,4 @@
+cron:
+- description: Update forecasts
+  url: /admin/forecast/update
+  schedule: every 4 hours
