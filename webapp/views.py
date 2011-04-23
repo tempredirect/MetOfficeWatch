@@ -1,5 +1,6 @@
 from functools import wraps
 from flask import Response, render_template, redirect, redirect, request
+from models import Site, ObservationTimestep
 
 from webapp import app
 import simplejson as json
@@ -31,3 +32,19 @@ def admin_required(func):
 @app.route('/')
 def index():                             
     return render_template('index.html')
+
+@app.route('/sites')
+def sites():
+    return json_list_response(Site.all().fetch(limit = 200))
+
+@app.route('/sites/<site_id>/latest')
+def site_latest(site_id):
+    site = Site.get_by_key_name(site_id)
+    if site is None:
+        return Response(status = 404)
+
+    obs = ObservationTimestep.find_latest_by_site(site = site, limit = 24)
+    return Response(json.dumps({
+       'site': site.to_dict(),
+       'observations': map(lambda o: o.to_dict(excluding = ['site']), obs)
+    }), content_type = "application/json")

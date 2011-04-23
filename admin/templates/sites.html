@@ -1,9 +1,10 @@
 {% extends "base.html" %}
 
-{% block title %}Jobs{% endblock %}
+{% block title %}Sites{% endblock %}
 {% block main %}
 <h2>Sites</h2>
-<a href="/admin/forecast/update">Update all forecasts</a>
+Update all : <a href="/admin/forecast/update?redirect">forecasts</a> |
+<a href="/admin/observation/update?redirect">observations</a>
 <table class="sites">
     <thead>
     <tr>
@@ -21,7 +22,7 @@
         <td>{{site.location}}</td>
         <td>
             <a href="#forecast" data-id="{{site.key().id_or_name()}}" class="forecast">forecast</a> |
-            <a href="#observations" data-id="{{site.key().id_or_name()}}" class="observation"></a>
+            <a href="#observations" data-id="{{site.key().id_or_name()}}" class="observation">observations</a>
         </td>
     </tr>
     {% endfor %}
@@ -37,7 +38,18 @@
             var id = $(this).attr("data-id");
             $.ajax({
                 url:"/admin/forecast/" + id + "/update",
-                method:'POST',
+                type:'POST',
+                success:function(){
+                    alert("Done");
+                }
+            });
+            e.preventDefault();
+        });
+        $('table.sites a.observation').click(function(e){
+            var id = $(this).attr("data-id");
+            $.ajax({
+                url:"/admin/observation/" + id + "/update",
+                type:'POST',
                 success:function(){
                     alert("Done");
                 }

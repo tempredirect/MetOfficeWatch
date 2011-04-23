@@ -5,7 +5,7 @@ from flask import Response, render_template, redirect, request
 from flask.helpers import url_for, flash
 
 from admin   import app
-from models import Site, ForecastTimestep
+from models import Site, ForecastTimestep, ObservationTimestep
 
 import simplejson as json
 import logging
@@ -69,8 +69,11 @@ def sites_store():
 def parse_forecast(content):
     return json.loads(content)["BestFcst"]["Forecast"]
 
-def timesteps(forecast):
-    days = forecast["Location"]["Day"]
+def parse_observation(content):
+    return json.loads(content)["BestFcst"]["Observations"]
+
+def timesteps(data):
+    days = data["Location"]["Day"]
     for day in days:
         date = day["@date"]
         for ts in day["TimeSteps"]["TimeStep"]:
@@ -80,12 +83,29 @@ def timesteps(forecast):
 
 @app.route('/admin/forecast/update')
 def forecast_update_all():
+
     sites = Site.all().fetch(limit = 200)
     for site in sites:
         taskqueue.add(url = "/admin/forecast/%s/update" % site.key().id_or_name())
 
-    flash("Started update tasks for all sites")
-    return redirect(url_for('sites'))
+    if request.args.get("redirect"):
+        flash("Started update forecast tasks for all sites")
+        return redirect(url_for('sites'))
+
+    return Response(status = 204)
+
+@app.route('/admin/observation/update')
+def observation_update_all():
+
+    sites = Site.all().fetch(limit = 200)
+    for site in sites:
+        taskqueue.add(url = "/admin/observation/%s/update" % site.key().id_or_name())
+
+    if request.args.get("redirect"):
+        flash("Started update observation tasks for all sites")
+        return redirect(url_for('sites'))
+
+    return Response(status = 204)
 
 @app.route('/admin/forecast/<site_key>/update', methods = ['post'])
 def forecast_update(site_key):
@@ -102,16 +122,48 @@ def forecast_update(site_key):
         for date, data in timesteps(forecast):
             forecast_timestep = ForecastTimestep.find_by_site_and_dates(site, date, issued_date)
             if forecast_timestep is None:
-                forecast_timestep = ForecastTimestep(site = site, forecast_datetime = date, issued_datetime = issued_date)
+                forecast_timestep = ForecastTimestep(site = site, forecast_datetime = date, issued_datetime = issued_date, forecast_date = date.date())
 
+                for k,v in data.items():
+                    prop_name = snake_case(k)
+                    if hasattr(forecast_timestep, prop_name):
+                        if v == "missing":
+                            v = None
+                        setattr(forecast_timestep, prop_name, v)
 
-            for k,v in data.items():
-                prop_name = snake_case(k)
-                if hasattr(forecast_timestep, prop_name):
-                    setattr(forecast_timestep, prop_name, v)
+                forecast_timestep.save()
 
-            forecast_timestep.save()
-            logging.info("%s, %s" % (str(date), str(forecast_timestep)))
+    return Response(status = 204)
+
+@app.route('/admin/observation/<site_key>/update', methods = ['post'])
+def observation_update(site_key):
+    site = Site.get_by_key_name(site_key)
+    if site is None:
+        return Response(status = 404)
+
+    url = "http://www.metoffice.gov.uk/public/data/PWSCache/BestForecast/Observation/%s?format=application/json" % site_key
+
+    result = urlfetch.fetch(url)
+    if result.status_code == 200:
+        observations = parse_observation(result.content)
+#        issued_date = parse_date(forecast["@dataDate"])
+        for date, data in timesteps(observations):
+            obs_timestep = ObservationTimestep.find_by_site_and_date(site, date)
+            if obs_timestep is None:
+                obs_timestep = ObservationTimestep(site = site, observation_datetime = date, observation_date = date.date())
+
+                for k,v in data.items():
+
+                    prop_name = snake_case(k)
+                    if hasattr(obs_timestep, prop_name):
+                        if v == "missing":
+                            v = None
+                        elif prop_name == 'temperature':
+                            v = float(v)
+                        setattr(obs_timestep, prop_name, v)
+
+                obs_timestep.save()
+            #logging.info("%s, %s" % (str(date), str(ObservationTimestep)))
 
     return Response(status = 204)
 

@@ -2,3 +2,6 @@ cron:
 - description: Update forecasts
   url: /admin/forecast/update
   schedule: every 4 hours
+- description: Update observations
+  url: /admin/observation/update
+  schedule: every 2 hours

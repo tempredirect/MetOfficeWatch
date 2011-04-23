@@ -2,6 +2,90 @@
 
 {% block title %}Home{% endblock %}
 {% block main %}
-This is an index page
+<div id="map_canvas" style="position:absolute;bottom:0;top:0;left:0;right:0;"></div>
+{% endblock %}
+{% block last %}
+<script id="site-dialog" type="text/x-jquery-tmpl">
+    <div class="site-dialog modal">
+        <h2>${name}</h2>
+        <div class="content">
+            <p></p>
+            <table class="weather data">
+                <tbody>
+                <tr>
+                    <td>Loading...</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</script>
+<script id="site-observations-rows" type="text/x-jquery-tmpl">
+    <tr>
+        <td>${observation_datetime}</td>
+        <td><img src="http://www.metoffice.gov.uk/public/pws/invent/lib/images/wxsymbols/w${weather_type}.png"/></td>
+        <td>${temperature}&deg;C</td>
+        <td>${wind_direction} ${wind_speed}mph</td>
+        <td>${pressure}</td>
+    </tr>
+</script>
+
+<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
+<script type="text/javascript">
+    (function(){
+        function showSiteDialog(site){
+            var $dialog = $('#site-dialog')
+                            .tmpl(site)
+                            .appendTo(document.body)
+                            .overlay({
+                                       mask:{
+                                           color:'#333',
+                                           loadSpeed:200,
+                                           opacity:0.8
+                                       },
+                                       load:true
+                                     });
+            $.getJSON('/sites/' + site.id + "/latest",function(data){
+                var $tbody = $dialog.find('table.weather tbody');
+                $tbody.children().remove();
+                $('#site-observations-rows')
+                    .tmpl(data.observations)
+                    .appendTo($tbody);
+            });
+        }
+
+        // on load initialisation
+        $(function() {
+            var myOptions = {
+                zoom: 6,
+                center: new google.maps.LatLng(54.22, -2.2),
+                mapTypeId: google.maps.MapTypeId.ROADMAP
+            };
+            var map = new google.maps.Map(document.getElementById("map_canvas"),
+                    myOptions);
+
+            $.getJSON('/sites',function(data){
+                $.each(data,function(index, site){
+                    var position = new google.maps.LatLng(site.location.lat,site.location.lon);
+                    var marker = new google.maps.Marker({
+                        position: position,
+                        map: map,
+                        title:site.name
+                    });
+                    google.maps.event.addListener(marker,'click',function(){
+                        showSiteDialog(site);
+
+    //                    var infoWindow = new google.maps.InfoWindow({
+    //                        content:"<h3>" + site.name +"</h3>",
+    //                        position:position
+    //                    });
+    //                    infoWindow.open(map);
+                    });
+                });
+            });
+        });
+    })();
+
+</script>
 {% endblock %}
 {% block footer %}-----{% endblock %}
