@@ -73,11 +73,13 @@ class ObservationTimestep(DictModel):
 
     wind_gust = db.IntegerProperty()
     wind_speed = db.IntegerProperty()
+    wind_direction = db.StringProperty()
     pressure = db.IntegerProperty()
     pressure_tendency = db.StringProperty()
     screen_relative_humidity = db.IntegerProperty()
     weather_type = db.IntegerProperty()
     temperature = db.FloatProperty()
+    visibility = db.IntegerProperty()
 
     @classmethod
     def find_by_site_and_date(cls, site, date):
