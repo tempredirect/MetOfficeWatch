@@ -13,16 +13,5 @@ indexes:
 - kind: ObservationTimestep
   properties:
   - name: site
-  - name: observation_date
-
-- kind: ObservationTimestep
-  properties:
-  - name: site
-  - name: observation_date
-    direction: desc
-
-- kind: ObservationTimestep
-  properties:
-  - name: site
   - name: observation_datetime
     direction: desc
