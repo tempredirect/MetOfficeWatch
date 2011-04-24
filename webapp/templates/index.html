@@ -33,6 +33,29 @@
 <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
 <script type="text/javascript">
     (function(){
+        function nonUniqueIndexBy(data, prop){
+            var len = data.length,
+                i,
+                result = {},
+                value,
+                element,
+                propFn;
+
+            propFn = _.isFunction(prop) ? prop: function(o){return o[prop];};
+
+            for( i = 0; i < len; i ++){
+                element = data[i];
+                value = propFn(element);
+                if( value ){
+                    if( result.hasOwnProperty(value)){
+                        result[value].push(element);
+                    }else{
+                        result[value] = [element];
+                    }
+                }
+            }
+            return result;
+        }
         function showSiteDialog(site){
             var $dialog = $('#site-dialog')
                             .tmpl(site)
@@ -46,7 +69,20 @@
                                        load:true
                                      });
             $.getJSON('/sites/' + site.id + "/latest",function(data){
-                var $tbody = $dialog.find('table.weather tbody');
+                var $tbody = $dialog.find('table.weather tbody'),
+                    forecasts = nonUniqueIndexBy(data.forecasts, 'forecast_datetime');
+                log(forecasts);
+                var tableData = _.map(data.observations, function(obs){
+                    var datetime = obs.observation_datetime,
+                        forecastsList = forecasts[datetime],
+                        forecastsByIssued;
+                    obs.best_forecasts = [];
+                    if( forecastsList){
+                        forecastsByIssued = nonUniqueIndexBy(forecastsList, function(f){return f.issued_datetime.slice(0,10);});
+                        log(forecastsByIssued);
+                    }
+                    return obs;
+                });
                 $tbody.children().remove();
                 $('#site-observations-rows')
                     .tmpl(data.observations)
@@ -74,12 +110,6 @@
                     });
                     google.maps.event.addListener(marker,'click',function(){
                         showSiteDialog(site);
-
-    //                    var infoWindow = new google.maps.InfoWindow({
-    //                        content:"<h3>" + site.name +"</h3>",
-    //                        position:position
-    //                    });
-    //                    infoWindow.open(map);
                     });
                 });
             });

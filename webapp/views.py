@@ -1,6 +1,7 @@
 from functools import wraps
 from flask import Response, render_template, redirect, redirect, request
-from models import Site, ObservationTimestep
+from models import Site, ObservationTimestep, Forecast, ForecastTimestep
+from utils import first, last
 
 from webapp import app
 import simplejson as json
@@ -44,7 +45,16 @@ def site_latest(site_id):
         return Response(status = 404)
 
     obs = ObservationTimestep.find_latest_by_site(site = site, limit = 24)
+    forecasts = []
+    if len(obs) > 0:
+        first_obs = first(obs)
+        last_obs = last(obs)
+
+        forecasts = ForecastTimestep.find_by_site_between_dates( site = site,
+                                                                 from_dt = last_obs.observation_datetime,
+                                                                 to_dt = first_obs.observation_datetime)
     return Response(json.dumps({
        'site': site.to_dict(),
-       'observations': map(lambda o: o.to_dict(excluding = ['site']), obs)
+       'observations': map(lambda o: o.to_dict(excluding = ['site']), obs),
+       'forecasts': map(lambda f: f.to_dict(excluding = ['site']), forecasts)
     }), content_type = "application/json")

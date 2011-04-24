@@ -66,6 +66,15 @@ class ForecastTimestep(DictModel):
 
         return q.get()
 
+    @classmethod
+    def find_by_site_between_dates(cls, site, from_dt, to_dt):
+        q = (ForecastTimestep.all()
+                .filter("site =", site)
+                .filter("forecast_datetime >=", from_dt)
+                .filter("forecast_datetime <=", to_dt))
+
+        return q.fetch(limit = 200)
+
 class ObservationTimestep(DictModel):
     site = db.ReferenceProperty(reference_class=Site)
     observation_datetime = db.DateTimeProperty()
