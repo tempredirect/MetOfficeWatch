@@ -11,6 +11,32 @@
         <div class="content">
             <p></p>
             <table class="weather data">
+                <thead>
+                <tr>
+                    <th colspan="5">Observations</th>
+                    <th colspan="5">Forecasts</th>
+                </tr>
+                <tr>
+                    <th colspan="5">&nbsp;</th>
+                    <th>Same day</th>
+                    <th>1<sub>st</sub></th>
+                    <th>2<sub>nd</sub></th>
+                    <th>3<sub>rd</sub></th>
+                    <th>4<sub>th</sub></th>
+                </tr>
+                <tr>
+                    <th>Observation</th>
+                    <th>Weather</th>
+                    <th>Temperature</th>
+                    <th>Wind</th>
+                    <th>Pressure</th>
+                    <th>Temp</th>
+                    <th>Temp</th>
+                    <th>Temp</th>
+                    <th>Temp</th>
+                    <th>Temp</th>
+                </tr>
+                </thead>
                 <tbody>
                 <tr>
                     <td>Loading...</td>
@@ -20,16 +46,22 @@
         </div>
     </div>
 </script>
+{% raw %}
 <script id="site-observations-rows" type="text/x-jquery-tmpl">
     <tr>
-        <td>${observation_datetime}</td>
+        <td>${$item.format(observation_datetime)}</td>
         <td><img src="http://www.metoffice.gov.uk/public/pws/invent/lib/images/wxsymbols/w${weather_type}.png"/></td>
         <td>${temperature}&deg;C</td>
         <td>${wind_direction} ${wind_speed}mph</td>
         <td>${pressure}</td>
+        <td>{{if best_forecasts[0]}}${best_forecasts[0].temperature}&deg;C{{/if}}</td>
+        <td>{{if best_forecasts[1]}}${best_forecasts[1].temperature}&deg;C{{/if}}</td>
+        <td>{{if best_forecasts[2]}}${best_forecasts[2].temperature}&deg;C{{/if}}</td>
+        <td>{{if best_forecasts[3]}}${best_forecasts[3].temperature}&deg;C{{/if}}</td>
+        <td>{{if best_forecasts[4]}}${best_forecasts[4].temperature}&deg;C{{/if}}</td>
     </tr>
 </script>
-
+{% endraw %}
 <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
 <script type="text/javascript">
     (function(){
@@ -56,6 +88,14 @@
             }
             return result;
         }
+        function buildFiveDayDates(from){
+            var today = dates.parse(from);
+            return _([0,1,2,3,4]).chain()
+                .map(function(i){return dates.addDay(today, -i)})
+                .map(dates.formatY8)
+                .value();
+        }
+
         function showSiteDialog(site){
             var $dialog = $('#site-dialog')
                             .tmpl(site)
@@ -71,21 +111,29 @@
             $.getJSON('/sites/' + site.id + "/latest",function(data){
                 var $tbody = $dialog.find('table.weather tbody'),
                     forecasts = nonUniqueIndexBy(data.forecasts, 'forecast_datetime');
-                log(forecasts);
+//                log(forecasts);
                 var tableData = _.map(data.observations, function(obs){
                     var datetime = obs.observation_datetime,
                         forecastsList = forecasts[datetime],
-                        forecastsByIssued;
-                    obs.best_forecasts = [];
+                        forecastsByIssueDate, fiveDayDates,
+                        today = dates.today();
                     if( forecastsList){
-                        forecastsByIssued = nonUniqueIndexBy(forecastsList, function(f){return f.issued_datetime.slice(0,10);});
-                        log(forecastsByIssued);
+                        forecastsByIssueDate = nonUniqueIndexBy(forecastsList, function(f){return f.issued_datetime.slice(0,10);});
+                        fiveDayDates = buildFiveDayDates(obs.observation_date);
+                        //log(forecastsByIssued);
+                        obs.best_forecasts = _.map(fiveDayDates,function(d){
+                            var forecasts = forecastsByIssueDate[d];
+                            return forecasts ? _.first(forecasts) : null;
+                        });
+                    } else {
+                        obs.best_forecasts = [null,null,null,null,null];
                     }
+//                    log(obs);
                     return obs;
                 });
                 $tbody.children().remove();
                 $('#site-observations-rows')
-                    .tmpl(data.observations)
+                    .tmpl(data.observations, { format: dates.formatDateTime })
                     .appendTo($tbody);
             });
         }
