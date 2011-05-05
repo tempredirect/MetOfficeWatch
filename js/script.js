@@ -30,7 +30,7 @@ $(function(){
       return null;
     },
     formatDateTime:function(value){
-      log(value);
+//      log(value);
       if( typeof value === 'string'){
         value = dates.parse(value);
       }
