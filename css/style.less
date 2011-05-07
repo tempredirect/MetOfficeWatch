@@ -235,9 +235,10 @@ button {  width: auto; overflow: visible; }
     border:2px solid #333;
 
     /*opacity:0.8;*/
-    border-radius:6px;
-    -moz-border-radius:6px;
-    -webkit-border-radius:6px;
+    .rounded-corners(6px);
+    /*border-radius:6px;*/
+    /*-moz-border-radius:6px;*/
+    /*-webkit-border-radius:6px;*/
 
     box-shadow: 0 0 50px #ccc;
     -moz-box-shadow: 0 0 50px #ccc;
@@ -249,6 +250,15 @@ button {  width: auto; overflow: visible; }
         padding:10px 0 10px 0;
         border-bottom:1px solid #333;
         font-size:20px;
+    }
+    .close {
+        background-image: url(../images/close.png);
+        position: absolute;
+        right: -15px;
+        top: -15px;
+        cursor: pointer;
+        height: 35px;
+        width: 35px;
     }
 }
 .site-dialog {

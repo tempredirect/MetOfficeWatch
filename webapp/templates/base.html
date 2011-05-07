@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="en" class="no-js">
 <head>
+    {% macro versioned(resource) -%}{{resource}}?v=4{%- endmacro %}
     <meta charset="utf-8">
 
     <!-- www.phpied.com/conditional-comments-block-downloads/ -->
@@ -10,7 +11,7 @@
 Remove this if you use the .htaccess -->
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
-    <title>{% block title %}{% endblock %} - Your application name</title>
+    <title>{% block title %}{% endblock %} - MetOffice Watch - Did they get it right?</title>
     <meta name="description" content="">
     <meta name="author" content="">
 
@@ -29,10 +30,10 @@ Remove this if you use the .htaccess -->
 
 
     <!-- CSS : implied media="all" -->
-    <link rel="stylesheet" href="/css/style.css?v=1">
+    <link rel="stylesheet" href="{{versioned('/css/style.css')}}">
 
     <!-- For the less-enabled mobile browsers like Opera Mini -->
-    <link rel="stylesheet" media="handheld" href="/css/handheld.css?v=1">
+    <link rel="stylesheet" media="handheld" href="{{versioned('/css/handheld.css')}}">
 
 
     <!-- All JavaScript at the bottom, except for Modernizr which enables HTML5 elements & feature detects -->
@@ -55,7 +56,7 @@ Remove this if you use the .htaccess -->
 
 <div id="container">
     <header>
-        <h1>Your application name</h1>
+        <h1>MetOffice Watch</h1>
     </header>
     <div id="nav">
         <ol>
@@ -78,15 +79,15 @@ Remove this if you use the .htaccess -->
 <!-- Javascript at the bottom for fast page loading -->
 
 <script src="http://cdn.jquerytools.org/1.2.5/full/jquery.tools.min.js"></script>
-<script>!window.jQuery && document.write('<script src="/js/jquery.tools.min.js?v=3"><\/script>')</script>
+<script>!window.jQuery && document.write("<script src=\"{{versioned('/js/jquery.tools.min.js')}}\"><\/script>")</script>
 
-<script src="/js/plugins.js?v=3"></script>
-<script src="/js/script.js?v=3"></script>
+<script src="{{versioned('/js/plugins.js')}}"></script>
+<script src="{{versioned('/js/script.js')}}"></script>
 
 {% block last %}{% endblock %}
 
 <!--[if lt IE 7 ]>
-<script src="/js/dd_belatedpng.js?v=3"></script>
+<script src="{{versioned('/js/dd_belatedpng.js')}}"></script>
 <![endif]-->
 
 
@@ -96,21 +97,17 @@ Remove this if you use the .htaccess -->
 <!-- end profiling code -->
 
 
-<!-- asynchronous google analytics: mathiasbynens.be/notes/async-analytics-snippet
-change the UA-XXXXX-X to be your site's ID -->
-<script>
-    var _gaq = [
-        ['_setAccount', 'UA-XXXXX-X'],
-        ['_trackPageview']
-    ];
-    (function(d, t) {
-        var g = d.createElement(t),
-                s = d.getElementsByTagName(t)[0];
-        g.async = true;
-        g.src = '//www.google-analytics.com/ga.js';
-        s.parentNode.insertBefore(g, s);
-    })(document, 'script');
-</script>
+<script type="text/javascript">
 
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-3235283-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script>
 </body>
 </html>
