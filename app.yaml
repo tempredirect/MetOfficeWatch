@@ -4,12 +4,22 @@ runtime: python
 api_version: 1
 
 handlers:
+- url: /css/(.*)\.less
+  static_files: css/\1.less
+  mime_type: text/css
+  upload: css/(.*)\.less
+
 - url: /css
   static_dir: css
 
 - url: /images
   static_dir: images
-  
+
+- url: /js/(.*)\.coffee
+  static_files: js/\1.coffee
+  mime_type: text/coffeescript
+  upload: js/(.*)\.coffee
+
 - url: /js
   static_dir: js
 

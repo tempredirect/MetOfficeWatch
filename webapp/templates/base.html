@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en" class="no-js">
 <head>
-    {% macro versioned(resource) -%}{{resource}}?v=4{%- endmacro %}
+    {% macro versioned(resource) -%}{{resource}}?v=5{%- endmacro %}
     <meta charset="utf-8">
 
     <!-- www.phpied.com/conditional-comments-block-downloads/ -->
@@ -82,7 +82,7 @@ Remove this if you use the .htaccess -->
 <script>!window.jQuery && document.write("<script src=\"{{versioned('/js/jquery.tools.min.js')}}\"><\/script>")</script>
 
 <script src="{{versioned('/js/plugins.js')}}"></script>
-<script src="{{versioned('/js/script.js')}}"></script>
+<script src="{{versioned('/js/scripts2.js')}}"></script>
 
 {% block last %}{% endblock %}
 

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="metofficewatch" default="build">
+
+  <target name="compile-less">
+    <apply executable="/opt/local/bin/lessc" failonerror="yes">
+      <env key="PATH" value="/opt/local/bin"/>
+      <srcfile/>
+      <targetfile/>
+      <fileset dir="${basedir}/css" includes="*.less"/>
+      <mapper type="glob" from="*.less" to="${basedir}/css/*.css" />
+    </apply>
+  </target>
+
+  <target name="compile-coffee">
+    <apply executable="/opt/local/bin/coffee" failonerror="yes">
+      <env key="PATH" value="/opt/local/bin"/>
+      <arg value="-c"/>
+      <srcfile/>
+      <fileset dir="${basedir}/js" includes="**/*.coffee"/>
+    </apply>
+  </target>
+
+  <target name="build" depends="compile-less, compile-coffee" description="build all dynamic elements"/>
+</project>
