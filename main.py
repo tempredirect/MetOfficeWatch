@@ -16,8 +16,11 @@
 #             
 from google.appengine.ext.webapp.util import run_wsgi_app
 from google.appengine.dist import use_library
+
+import fix_path
+
 from webapp import app
-import logging
+import simplejson as json
 
 use_library('django', '0.96')
 

@@ -1,10 +1,10 @@
 buildFiveDayDates = (from)->
     today = dates.parse(from)
-    return _([0..4]).chain()
-        .map((i) -> dates.addDay(today, -i))
-        .map(dates.formatY8)
-        .value()
+    for i in [0..4]
+        dates.formatY8 dates.addDay(today, -i)
 
+
+#http://www.metoffice.gov.uk/public/pws/invent/lib/images/wxsymbols/w12BIG.gif
 
 window.showSiteDialog = (site) ->
     $dialog = $('#site-dialog')
@@ -18,7 +18,8 @@ window.showSiteDialog = (site) ->
                            },
                            load:true})
 
-    $.getJSON('/sites/' + site.id + "/latest", (data) ->
+
+    $.getJSON("/sites/#{site.id}/detail", (data) ->
         $tbody = $dialog.find('table.weather tbody')
         forecasts = utils.nonUniqueIndexBy(data.forecasts, 'forecast_datetime')
 
@@ -30,16 +31,16 @@ window.showSiteDialog = (site) ->
             obs.best_forecasts = if forecastsList
                     forecastsByIssueDate = utils.nonUniqueIndexBy(forecastsList, (f) -> f.issued_datetime.slice(0,10))
                     fiveDayDates = buildFiveDayDates(obs.observation_date)
-                    obs.best_forecasts = _.map(fiveDayDates, (d) ->
+                    obs.best_forecasts = for d in fiveDayDates
                         f = forecastsByIssueDate[d]
                         if f then _.first(f) else null
-                    )
+
                 else
                     # no forecasts just return null in all the slots
                     null for i in [0..4]
 
         $tbody.children().remove()
         $('#site-observations-rows')
-            .tmpl(data.observations, { format: dates.formatDateTime })
+            .tmpl(data.observations, format: dates.formatDateTime )
             .appendTo($tbody)
     )

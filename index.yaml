@@ -15,6 +15,12 @@ indexes:
   - name: site
   - name: forecast_datetime
 
+- kind: ForecastTimestep
+  properties:
+  - name: site
+  - name: forecast_datetime
+    direction: desc
+
 - kind: ObservationTimestep
   properties:
   - name: site

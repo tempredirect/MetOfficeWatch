@@ -1,4 +1,5 @@
 from functools import wraps
+import dataccess
 from flask import Response, render_template, redirect, redirect, request
 from models import Site, ObservationTimestep, Forecast, ForecastTimestep
 from utils import first, last
@@ -40,6 +41,14 @@ def sites():
 
 @app.route('/sites/<site_id>/latest')
 def site_latest(site_id):
+    result = dataccess.latest_obs_and_forecast(site_id)
+    if result is None:
+        return Response(status = 404)
+
+    return Response(json.dumps(result), content_type = "application/json")
+
+@app.route('/sites/<site_id>/detail')
+def site_detail(site_id):
     site = Site.get_by_key_name(site_id)
     if site is None:
         return Response(status = 404)

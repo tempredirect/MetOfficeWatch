@@ -1,3 +1,4 @@
+import fix_path
 from flask import Flask
 import settings
 
