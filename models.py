@@ -83,6 +83,14 @@ class ForecastTimestep(DictModel):
                 .order("-forecast_datetime"))
         return q.fetch(limit = limit)
 
+    def forecast_range(self):
+        """Returns the number of days this forecast was give out at.
+           0 == issued on the day of forecast
+           4 == fifth day forecast
+        """
+        delta = self.forecast_date - self.issued_datetime.date()
+        return delta.days
+
 class ObservationTimestep(DictModel):
     site = db.ReferenceProperty(reference_class=Site)
     observation_datetime = db.DateTimeProperty()

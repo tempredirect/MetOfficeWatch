@@ -72,11 +72,17 @@ def parse_forecast(content):
 def parse_observation(content):
     return json.loads(content)["BestFcst"]["Observations"]
 
+
+def ensure_array(value):
+    if isinstance(value, str):
+        return [value]
+    return value
+
 def timesteps(data):
     days = data["Location"]["Day"]
     for day in days:
         date = day["@date"]
-        for ts in day["TimeSteps"]["TimeStep"]:
+        for ts in ensure_array(day["TimeSteps"]["TimeStep"]):
             time = ts["@time"]
             timestamp = parse_date("%sT%s.000Z" % (date, time))
             yield timestamp, ts["WeatherParameters"]
