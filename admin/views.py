@@ -11,7 +11,7 @@ import simplejson as json
 import logging
 from utils import chunks, snake_case
 
-from iso8601 import parse_date
+from lib.iso8601 import parse_date
 
 @app.route('/admin')
 def index():                             
@@ -74,9 +74,10 @@ def parse_observation(content):
 
 
 def ensure_array(value):
-    if isinstance(value, str):
-        return [value]
-    return value
+    if isinstance(value, list) or value is None:
+        return value
+    # else wrap it up
+    return [value]
 
 def timesteps(data):
     days = data["Location"]["Day"]
