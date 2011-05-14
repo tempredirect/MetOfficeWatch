@@ -5,3 +5,6 @@ cron:
 - description: Update observations
   url: /admin/observation/update
   schedule: every 2 hours
+- description: Update site master list
+  url: /admin/sites/refresh
+  schedule: every 24 hours
