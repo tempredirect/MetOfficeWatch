@@ -81,7 +81,7 @@ def ensure_array(value):
 
 def timesteps(data):
     days = data["Location"]["Day"]
-    for day in days:
+    for day in ensure_array(days):
         date = day["@date"]
         for ts in ensure_array(day["TimeSteps"]["TimeStep"]):
             time = ts["@time"]
