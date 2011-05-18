@@ -45,7 +45,7 @@ dates = window.dates =
         if typeof value is 'string'
             value = dates.parse(value);
 
-        return "" + (value.getUTCDate() + 1) + " " + months[value.getUTCMonth()] + " " + leftPad(value.getUTCHours(),2,'0') + ":" + leftPad(value.getUTCMinutes(),2,'0');
+        return "#{value.getUTCDate()} #{months[value.getUTCMonth()]} #{leftPad(value.getUTCHours(),2,'0')}:#{leftPad(value.getUTCMinutes(),2,'0')}";
 
     parse:(input) ->
         return null if input == null

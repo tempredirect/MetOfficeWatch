@@ -398,7 +398,8 @@ button {
   width: 35px;
 }
 .site-dialog {
-  width: 650px;
+  left: 50px;
+  right: 50px;
 }
 .site-dialog .content {
   height: 400px;
@@ -406,4 +407,67 @@ button {
 }
 .site-dialog .content table.weather {
   width: 100%;
+}
+/* root element for tabs  */
+ul.tabs {
+  margin: 0 !important;
+  padding: 0;
+  height: 30px;
+  border-bottom: 1px solid #666;
+  /* single tab */
+
+  /* link inside the tab. uses a background image */
+
+  /* selected tab */
+
+  /* tab pane */
+
+}
+ul.tabs li {
+  float: left;
+  padding: 0;
+  margin: 0;
+  list-style-type: none;
+}
+ul.tabs a {
+  float: left;
+  font-size: 13px;
+  display: block;
+  padding: 5px 30px;
+  text-decoration: none;
+  border: 1px solid #666;
+  border-bottom: 0px;
+  height: 18px;
+  background-color: #efefef;
+  color: #777;
+  margin-right: 2px;
+  position: relative;
+  top: 1px;
+  outline: 0;
+  -moz-border-radius: 4px 4px 0 0;
+}
+ul.tabs a:hover {
+  background-color: #F7F7F7;
+  color: #333;
+}
+ul.tabs a.current {
+  background-color: #ddd;
+  border-bottom: 1px solid #ddd;
+  color: #000;
+  cursor: default;
+}
+ul.tabs .panes div.pane {
+  display: none;
+  border: 1px solid #666;
+  border-width: 0 1px 1px 1px;
+  min-height: 150px;
+  padding: 15px 20px;
+  background-color: #ddd;
+}
+.summary table td, .summary table th {
+  text-align: center;
+}
+.summary table tbody th {
+  text-align: right;
+  vertical-align: center;
 }
