@@ -17,9 +17,11 @@ buildFiveDayDates = (from)->
                                opacity:0.8
                            },
                            load:true})
-    $dialog.find("ul.tabs").tabs("div.panes > div")
+
+    detailLoading = false
 
     loadDetail = ->
+        return if detailLoading
         $.getJSON "/sites/#{site.id}/detail", (data) ->
             $tbody = $dialog.find('table.weather tbody')
             forecasts = utils.nonUniqueIndexBy(data.forecasts, 'forecast_datetime')
@@ -44,6 +46,7 @@ buildFiveDayDates = (from)->
             $('#site-observations-rows')
                 .tmpl(data.observations, format: dates.formatDateTime )
                 .appendTo($tbody)
+        detailLoading = yes;
 
     $.getJSON "/sites/#{site.id}/latest", (data) ->
         $dialog.find('.summary').html('');
@@ -70,3 +73,7 @@ buildFiveDayDates = (from)->
             forecasts: (obs) -> (i or {}) for i in obs.best_forecast
 
         $('#site-summary').tmpl(data, functions).appendTo($dialog.find('.summary'));
+
+    $dialog.find("ul.tabs").tabs "div.panes > div", onClick: (e,i) ->
+        console.info(i)
+        loadDetail() if i is 1
