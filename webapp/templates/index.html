@@ -154,7 +154,14 @@
         $(function() {
             var myOptions = {
                 zoom: 6,
+                maxZoom:10,
+                minZoom:4,
                 center: new google.maps.LatLng(54.22, -2.2),
+                mapTypeControlOptions: {
+                    mapTypeIds: [google.maps.MapTypeId.ROADMAP]
+                },
+                streetViewControl:false,
+                disableDoubleClickZoom:true,
                 mapTypeId: google.maps.MapTypeId.ROADMAP
             };
             var map = new google.maps.Map(document.getElementById("map_canvas"),
@@ -178,4 +185,3 @@
 
 </script>
 {% endblock %}
-{% block footer %}-----{% endblock %}

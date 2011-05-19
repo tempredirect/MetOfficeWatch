@@ -401,7 +401,7 @@ button {
   left: 50px;
   right: 50px;
   background-image: url(/images/exclusive_paper.gif);
-  background-repeat: both;
+  background-repeat: repeat;
 }
 .site-dialog .content {
   height: 400px;
@@ -503,4 +503,20 @@ ul.tabs .panes div.pane {
   text-decoration: none;
   cursor: help;
   color: black;
+}
+body {
+  background-image: url(/images/exclusive_paper.gif);
+  background-repeat: repeat;
+}
+body header {
+  position: absolute;
+  height: 50px;
+  margin-top: -25px;
+  text-align: center;
+  top: 50%;
+  left: 0;
+  right: 0;
+  font-size: 50px;
+  color: gray;
+  text-shadow: #003366;
 }
