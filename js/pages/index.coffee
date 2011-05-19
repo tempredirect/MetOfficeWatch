@@ -51,6 +51,7 @@ buildFiveDayDates = (from)->
     $.getJSON "/sites/#{site.id}/latest", (data) ->
         $dialog.find('.summary').html('');
 
+        forecastHeaders = ["Same day", "One day", "Two day", "Three day", "Four day", "Five Day"]
         functions =
             format: dates.formatDateTime
             pressure: (value) ->
@@ -70,6 +71,10 @@ buildFiveDayDates = (from)->
                     vis = value.visibility / 1000
                     if vis < 1 then "< 1km" else "#{vis.toFixed(0)}km"
                 else "-"
+            forecastHeader:(forecast, i) ->
+                if forecast.issued_datetime?
+                    "<th title='Issued #{dates.formatDateTime(forecast.issued_datetime)}'>#{forecastHeaders[i]}</th>"
+                else "<th>#{forecastHeaders[i]}</th>"
             forecasts: (obs) -> (i or {}) for i in obs.best_forecast
 
         $('#site-summary').tmpl(data, functions).appendTo($dialog.find('.summary'));
@@ -77,3 +82,9 @@ buildFiveDayDates = (from)->
     $dialog.find("ul.tabs").tabs "div.panes > div", onClick: (e,i) ->
         console.info(i)
         loadDetail() if i is 1
+
+
+$ ->
+    $("a.missed-forecast").live 'click', (e) ->
+        e.preventDefault()
+        alert("For some reason we don't have a record of this forecast");

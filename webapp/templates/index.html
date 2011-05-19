@@ -78,68 +78,66 @@
         <thead>
             <tr>
                 <th>&nbsp;</th>
-                <th>Latest</th>
-                <th>Last forecast</th>
-                <th>One Day</th>
-                <th>Two Day</th>
-                <th>Three Day</th>
-                <th>Four Day</th>
+                <th title="${$item.format(observation.observation_datetime)}">Latest</th>
+                {{each(i,f) $item.forecasts(observation)}}
+                    {{html $item.forecastHeader(f, i)}}
+                {{/each}}
             </tr>
         </thead>
         <tbody>
         <tr>
-            <th>Weather</th>
-            <td width="145"><img width="145" height="145" src="http://www.metoffice.gov.uk/public/pws/invent/lib/images/wxsymbols/w${observation.weather_type}BIG.gif"/></td>
+            <th class="weather">Weather</th>
+            <td width="145" class="observation weather"><img width="145" height="145" src="http://www.metoffice.gov.uk/public/pws/invent/lib/images/wxsymbols/w${observation.weather_type}BIG.gif"/></td>
             {{each $item.forecasts(observation)}}
-            <td width="145">
+            <td width="145" class="forecast forecast-${$index} weather">
                 {{if $value.forecast_date != null}}
                     <img width="145" height="145" src="http://www.metoffice.gov.uk/public/pws/invent/lib/images/wxsymbols/w${$value.weather_type}BIG.gif"/>
                 {{else}}
-                    missing forecast
+                    <a href="#missed-forecast-help" class="missed-forecast">missing</a>
                 {{/if}}
             </td>
             {{/each}}
         </tr>
         <tr>
             <th>Temperature</th>
-            <td>
+            <td class="observation temperature">
                 ${$item.temperature(observation)}
             </td>
             {{each $item.forecasts(observation)}}
-            <td>
+            <td class="forecast forecast-${$index} temperature">
                 ${$item.temperature($value)}
             </td>
             {{/each}}
         </tr>
         <tr>
             <th>Wind</th>
-            <td>
+            <td class="observation wind">
                 ${$item.wind(observation)}
             </td>
             {{each $item.forecasts(observation)}}
-            <td>
+            <td class="forecast forecast-${$index} wind">
                 ${$item.wind($value)}
             </td>
             {{/each}}
         </tr>
         <tr>
             <th>Pressure</th>
-            <td>
+            <td class="observation pressure">
                 ${$item.pressure(observation)}
             </td>
             {{each $item.forecasts(observation)}}
-            <td>
+            <td class="forecast forecast-${$index} pressure">
                 ${$item.pressure($value)}
             </td>
             {{/each}}
         </tr>
         <tr>
             <th>Visibility</th>
-            <td>
+            <td class="observation visibility">
                 ${$item.visibility(observation)}
             </td>
             {{each $item.forecasts(observation)}}
-            <td>
+            <td class="forecast forecast-${$index} visibility">
                 ${$item.visibility($value)}
             </td>
             {{/each}}

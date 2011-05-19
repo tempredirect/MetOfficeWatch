@@ -400,6 +400,8 @@ button {
 .site-dialog {
   left: 50px;
   right: 50px;
+  background-image: url(/images/exclusive_paper.gif);
+  background-repeat: both;
 }
 .site-dialog .content {
   height: 400px;
@@ -469,4 +471,36 @@ ul.tabs .panes div.pane {
 }
 .summary table tbody th {
   text-align: right;
+}
+.summary table tbody td.observation {
+  background-color: rgba(255, 255, 153, 0.5);
+}
+.summary table tbody td.forecast-0 {
+  background-color: rgba(204, 255, 153, 0.2);
+}
+.summary table tbody td.forecast-1 {
+  background-color: rgba(217, 255, 179, 0.2);
+}
+.summary table tbody td.forecast-2 {
+  background-color: rgba(230, 255, 204, 0.2);
+}
+.summary table tbody td.forecast-3 {
+  background-color: rgba(242, 255, 230, 0.2);
+}
+.summary table tbody td.forecast-4 {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+.summary table tbody td.forecast-5 {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+.summary table tbody td.forecast, .summary table tbody td.observation {
+  font-size: larger;
+}
+.summary table tbody .weather {
+  line-height: 145px;
+}
+.summary table a.missed-forecast {
+  text-decoration: none;
+  cursor: help;
+  color: black;
 }

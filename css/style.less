@@ -264,6 +264,9 @@ button {  width: auto; overflow: visible; }
 .site-dialog {
     left:50px;
     right:50px;
+    background-image:url(/images/exclusive_paper.gif);
+    background-repeat:both;
+
     .content {
         height:400px;
         overflow-y:scroll;
@@ -333,6 +336,30 @@ ul.tabs {
     }
     tbody th {
         text-align: right;
+    }
+    tbody {
+        td.observation {
+            background-color:rgba(255,255,153,0.5);
+        }
+        @forecast:rgba(204,255,153,0.2);
+        td.forecast-0 { background-color: @forecast; }
+        td.forecast-1 { background-color:lighten(@forecast,5%); }
+        td.forecast-2 { background-color:lighten(@forecast,10%); }
+        td.forecast-3 { background-color:lighten(@forecast,15%); }
+        td.forecast-4 { background-color:lighten(@forecast,20%); }
+        td.forecast-5 { background-color:lighten(@forecast,25%); }
+
+        td.forecast, td.observation{
+            font-size:larger;
+        }
+        .weather{
+            line-height: 145px;
+        }
+    }
+    a.missed-forecast {
+        text-decoration: none;
+        cursor: help;
+        color:black;
     }
 }
 
