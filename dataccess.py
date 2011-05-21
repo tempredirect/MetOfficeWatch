@@ -24,7 +24,7 @@ def latest_obs_and_forecast(site_id):
 
     if len(obs) > 0:
         forecasts = ForecastTimestep.find_by_site_closest_by_date(site, first(obs).observation_datetime,
-                                                                  limit=15)
+                                                                  limit=50)
         closest_forecast = first(forecasts)
         if closest_forecast:
             matching_obs = first(filter(lambda o: o.observation_datetime == closest_forecast.forecast_datetime, obs))
@@ -38,12 +38,12 @@ def latest_obs_and_forecast(site_id):
                     'site': site.to_dict(),
                     'observation': obs_dict
                 }
-#                memcache.set(site_id, result, 60 * 60, namespace='site_latest')
+                memcache.set(site_id, result, 60 * 60, namespace='site_latest')
 
     return result
 
 def make_five_day_list(forecasts, min = 5):
-    slist = SparseList([None for i in range(0,5)])
+    slist = SparseList([None for i in range(0,min)])
     for f in forecasts:
         r = f.forecast_range()
         if slist[r] is None:
