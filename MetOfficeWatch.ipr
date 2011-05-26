@@ -234,9 +234,9 @@
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs />
-      <option name="SDK_HOME" value="/System/Library/Frameworks/Python.framework/Versions/2.6/bin/python2.6" />
+      <option name="SDK_HOME" value="/System/Library/Frameworks/Python.framework/Versions/2.5/bin/python2.5" />
       <option name="WORKING_DIRECTORY" value="" />
-      <option name="IS_MODULE_SDK" value="true" />
+      <option name="IS_MODULE_SDK" value="false" />
       <module name="MetOfficeWatch" />
       <option name="browserUrl" value="" />
       <option name="additionalOptions" value="--use_sqlite --skip_sdk_update_check" />

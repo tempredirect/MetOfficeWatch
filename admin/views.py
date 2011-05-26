@@ -155,7 +155,7 @@ def observation_update(site_key):
         observations = parse_observation(result.content)
 #        issued_date = parse_date(forecast["@dataDate"])
         for date, data in timesteps(observations):
-            obs_timestep = ObservationTimestep.find_by_site_and_date(site, date)
+            obs_timestep = ObservationTimestep.get_by_site_and_datetime(site, date)
             if obs_timestep is None:
                 obs_timestep = ObservationTimestep(site = site, observation_datetime = date, observation_date = date.date())
 

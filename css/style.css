@@ -518,5 +518,5 @@ body header {
   right: 0;
   font-size: 50px;
   color: gray;
-  text-shadow: #003366;
+  text-shadow: 0 1px 1px white;
 }

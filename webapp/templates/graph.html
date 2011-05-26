@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}Site{% endblock %}
+{% block main %}
+<div id="graph_canvas" style="position:absolute;bottom:0;top:0;left:0;right:0;"></div>
+{% endblock %}
+{% block last %}
+<script type="text/javascript" src="{{versioned('/js/highcharts.src.js')}}"></script>
+<script type="text/javascript" src="{{versioned('/js/pages/graph.js')}}"></script>
+<script type="text/javascript">
+    // on load initialisation
+    $(function() {
+        loadSiteGraph({{site.key().name()}}, 'graph_canvas');
+    });
+
+</script>
+{% endblock %}

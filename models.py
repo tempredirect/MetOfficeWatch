@@ -73,7 +73,7 @@ class ForecastTimestep(DictModel):
                 .filter("forecast_datetime >=", from_dt)
                 .filter("forecast_datetime <=", to_dt))
 
-        return q.fetch(limit = 200)
+        return q.fetch(limit = 500)
 
     @classmethod
     def find_by_site_closest_by_date(cls, site, date_and_time, limit=1):
@@ -107,7 +107,7 @@ class ObservationTimestep(DictModel):
     visibility = db.IntegerProperty()
 
     @classmethod
-    def find_by_site_and_date(cls, site, date):
+    def get_by_site_and_datetime(cls, site, date):
         q = (ObservationTimestep.all()
                 .filter("site =", site)
                 .filter("observation_datetime =", date))
@@ -120,3 +120,11 @@ class ObservationTimestep(DictModel):
                 .order("-observation_datetime"))
 
         return q.fetch(limit = limit)
+
+    @classmethod
+    def find_by_site_and_date(cls, site, obs_date, offset = 0, limit = 50):
+        q = (ObservationTimestep.all()
+                .filter("site =", site)
+                .filter("observation_date", obs_date)
+                .order("-observation_datetime"))
+        return q.fetch(offset = offset, limit = limit)
