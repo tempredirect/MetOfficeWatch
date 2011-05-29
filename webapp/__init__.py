@@ -6,4 +6,5 @@ app.debug = True
 app.config.from_object('webapp.settings')
 
 import views
+import sites
 import filters
