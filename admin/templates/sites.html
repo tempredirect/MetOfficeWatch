@@ -4,7 +4,8 @@
 {% block main %}
 <h2>Sites</h2>
 Update all : <a href="/admin/forecast/update?redirect">forecasts</a> |
-<a href="/admin/observation/update?redirect">observations</a>
+<a href="/admin/observation/update?redirect">observations</a> |
+<a href="/admin/sites/refresh">sites</a>
 <table class="sites">
     <thead>
     <tr>
@@ -48,7 +49,7 @@ Update all : <a href="/admin/forecast/update?redirect">forecasts</a> |
         $('table.sites a.observation').click(function(e){
             var id = $(this).attr("data-id");
             $.ajax({
-                url:"/admin/observation/" + id + "/update",
+                url:"/admin/sites/" + id + "/observation/update",
                 type:'POST',
                 success:function(){
                     alert("Done");

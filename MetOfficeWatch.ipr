@@ -51,6 +51,15 @@
     <option name="DEPRECATION" value="false" />
   </component>
   <component name="Encoding" useUTFGuessing="true" native2AsciiForPropertiesFiles="false" />
+  <component name="FacetAutodetectingManager">
+    <autodetection-disabled>
+      <facet-type id="django">
+        <modules>
+          <module name="MetOfficeWatch" />
+        </modules>
+      </facet-type>
+    </autodetection-disabled>
+  </component>
   <component name="IdProvider" IDEtalkID="BF1E3EACECD65BC5FA992B7E283CCEB4" />
   <component name="InspectionProjectProfileManager">
     <profiles>
