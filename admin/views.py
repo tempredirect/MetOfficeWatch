@@ -189,25 +189,7 @@ def observation_update(site_key):
 
         for o in obs.values():
             o.save()
-
-#        issued_date = parse_date(forecast["@dataDate"])
-#        for date, data in timesteps(observations):
-#            obs_timestep = ObservationTimestep.get_by_site_and_datetime(site, date)
-#            if obs_timestep is None:
-#                obs_timestep = ObservationTimestep(site = site, observation_datetime = date, observation_date = date.date())
-#
-#                for k,v in data.items():
-#
-#                    prop_name = snake_case(k)
-#                    if hasattr(obs_timestep, prop_name):
-#                        if v == "missing":
-#                            v = None
-#                        elif prop_name == 'temperature':
-#                            v = float(v)
-#                        setattr(obs_timestep, prop_name, v)
-#
-#                obs_timestep.save()
-#            #logging.info("%s, %s" % (str(date), str(ObservationTimestep)))
+        site.save()
 
     return Response(status = 204)
 
