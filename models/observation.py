@@ -6,8 +6,8 @@ class Observations(JsonMixin):
     def __init__(self):
         self.observations = {}
 
-    def add(self, time, weather):
-        self.observations[time] = weather
+    def add(self, observation_datetime, weather):
+        self.observations[observation_datetime.time().isoformat()] = weather
 
     def to_json(self):
         result = {}

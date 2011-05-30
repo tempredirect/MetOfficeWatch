@@ -5,11 +5,11 @@ from flask import Response, render_template, redirect, request
 from flask.helpers import url_for, flash
 
 from admin   import app
-from models import Site, ForecastTimestep, ObservationTimestep, ForecastDay, ObservationDay, make_key_name, Weather, Observations
+from models import Site, ForecastTimestep, ObservationTimestep, ForecastDay, ObservationDay, make_key_name, Weather, Observations, Forecast
 
 import simplejson as json
 import logging
-from utils import chunks, snake_case
+from utils import chunks, snake_case, parse_yyyy_mm_dd_date
 from datetime import datetime
 from lib.iso8601 import parse_date
 
@@ -78,6 +78,18 @@ def ensure_array(value):
     # else wrap it up
     return [value]
 
+def days(data):
+    days = data["Location"]["Day"]
+    for day in ensure_array(days):
+        date = parse_yyyy_mm_dd_date(day["@date"])
+        yield date, day
+
+def day_timesteps(day):
+    for ts in ensure_array(day["TimeSteps"]["TimeStep"]):
+        time = ts["@time"]
+        timestamp = parse_date("%sT%s.000Z" % (day["@date"], time))
+        yield timestamp, ts["WeatherParameters"]
+
 def timesteps(data):
     days = data["Location"]["Day"]
     for day in ensure_array(days):
@@ -92,7 +104,8 @@ def forecast_update_all():
 
     sites = Site.all().fetch(limit = 200)
     for site in sites:
-        taskqueue.add(url = "/admin/forecast/%s/update" % site.key().id_or_name(), queue_name="update")
+        taskqueue.add(url = "/admin/sites/%s/forecast/update" % site.key().id_or_name(), queue_name="update")
+        taskqueue.add(url = "/admin/sites/%s/forecast/update2" % site.key().id_or_name(), queue_name="update")
 
     if request.args.get("redirect"):
         flash("Started update forecast tasks for all sites")
@@ -114,8 +127,8 @@ def observation_update_all():
 
     return Response(status = 204)
 
-@app.route('/admin/forecast/<site_key>/update', methods = ['post'])
-def forecast_update(site_key):
+@app.route('/admin/sites/<site_key>/forecast/update2', methods = ['post'])
+def forecast_update2(site_key):
     site = Site.get_by_key_name(site_key)
     if site is None:
         return Response(status = 404)
@@ -140,6 +153,39 @@ def forecast_update(site_key):
 
                 forecast_timestep.save()
 
+    return Response(status = 204)
+
+@app.route('/admin/sites/<site_key>/forecast/update', methods = ['post'])
+def forecast_update(site_key):
+    site = Site.get_by_key_name(site_key)
+    if site is None:
+        return Response(status = 404)
+
+    forecast_url = "http://www.metoffice.gov.uk/public/data/PWSCache/BestForecast/Forecast/%s?format=application/json" % site_key
+
+    result = urlfetch.fetch(forecast_url)
+    if result.status_code == 200:
+        forecast = parse_forecast(result.content)
+        issued_date = parse_date(forecast["@dataDate"])
+        for date, day in days(forecast):
+            forecast_day = ForecastDay.get_by_key_name(make_key_name(site,date))
+            if forecast_day is None:
+                forecast_day = ForecastDay(key_name=make_key_name(site,date), forecast_date = date)
+
+            for timestep, data in day_timesteps(day):
+                w = Forecast()
+                w.issued = issued_date
+                for k,v in data.items():
+                    prop_name = snake_case(k)
+                    if hasattr(w, prop_name):
+                        if v == "missing":
+                            v = None
+                        setattr(w, prop_name, v)
+
+                forecast_day.forecasts.add(timestep,w)
+
+            forecast_day.save()
+        site.save()
     return Response(status = 204)
 
 @app.route('/admin/sites/<site_key>/observation/update', methods = ['post'])
@@ -185,7 +231,7 @@ def observation_update(site_key):
                     elif prop_name == 'temperature':
                         v = float(v)
                     setattr(w, prop_name, v)
-            o.observations.add(date.time().isoformat(), w)
+            o.observations.add(date, w)
 
         for o in obs.values():
             o.save()

@@ -1,17 +1,31 @@
+from datetime import datetime
 from google.appengine.ext import db
 from jsonproperty import JsonMixin, JsonProperty
 from lib.iso8601 import parse_date
 from models import DictModel, Site, jsonvalue, Weather
+from utils import SparseList
+
+def forecast_range(forecast, issued):
+    """Returns the number of days this forecast was give out at.
+       0 == issued on the day of forecast
+       4 == fifth day forecast
+    """
+    if isinstance(forecast, datetime):
+        forecast = forecast.date()
+    if isinstance(issued, datetime):
+        issued = issued.date()
+    delta = forecast - issued
+    return delta.days
 
 class Forecast(Weather):
 
-    def __init__(self, values):
-        super(values)
-        self.issued = parse_date(values.issued)
+    def __init__(self, values = {}):
+        super(Forecast,self).__init__(values)
+        self.issued = parse_date(values['issued']) if 'issued' in values else None
 
     def to_json(self):
-        result = super.to_json()
-        result.issued = jsonvalue(self.issued)
+        result = super(Forecast,self).to_json()
+        result['issued'] = jsonvalue(self.issued)
         return result
 
     @classmethod
@@ -19,36 +33,80 @@ class Forecast(Weather):
         return Forecast(json)
 
 class Forecasts(JsonMixin):
+    """
+     [0, {
+            "10:00:00": [
+                       { forecast1 },
+                       { forecast2 },
+                    ]
+         }
+      1, {}
+      2, {}]
+    """
     def __init__(self):
-        self.forecasts = {}
+        self.forecasts = SparseList()
 
-    def add(self, time, forecast):
-        if time in self.forecasts:
-            self.forecasts[time].append(forecast)
+    def add(self, forecast_datetime, forecast):
+        r = forecast_range(forecast_datetime, forecast.issued)
+
+        time = forecast_datetime.time().isoformat()
+        forecasts_by_time = self.forecasts[r]
+        if forecasts_by_time is None:
+            forecasts_by_time = self.forecasts[r] = {}
+
+        if time in forecasts_by_time:
+
+            forecast_list = forecasts_by_time[time]
+            # check for existing forecast by issue
+            def indexof():
+                issued = forecast.issued
+                for i,f in enumerate(forecast_list):
+                    if f.issued == issued:
+                        return i
+                return -1
+            i = indexof()
+
+            if i > -1:
+                forecast_list[i] = forecast
+            else:
+                forecast_list.append(forecast)
         else:
-            self.forecasts[time] = [forecast]
+            forecasts_by_time[time] = [forecast]
 
     def __getitem__(self, item):
         return self.forecasts[item]
 
     def to_json(self):
-        result = {}
-        for k,v in self.forecasts.items():
-            result[k] = v.to_json()
+        result = []
+        for v in self.forecasts:
+            if v is not None:
+                forecasts_by_time = {}
+                for time,forecast_list in v.iteritems():
+                    forecasts_by_time[time] = map(lambda f: f.to_json(), forecast_list)
+                result.append(forecasts_by_time)
+            else:
+                result.append(None)
         return result
 
     @classmethod
     def from_json(cls, json):
         f = Forecasts()
-        for k,v in json.items():
-            f.add(k, Forecasts(v))
+        for v in json:
+            if v is not None:
+                forecasts_by_time = {}
+                for time, forecast_list in v.iteritems():
+                    forecasts_by_time[time] = map(lambda v: Forecast.from_json(v), forecast_list)
+                f.forecasts.append(forecasts_by_time)
+            else:
+                f.forecasts.append(None)
         return f
 
 
 class ForecastDay(DictModel):
     site = db.ReferenceProperty(reference_class=Site)
     forecast_date = db.DateProperty()
-    forecasts = JsonProperty(Forecasts)
+    lastdata_datetime = db.DateTimeProperty()
+    forecasts = JsonProperty(Forecasts, default=Forecasts())
 
 
 class ForecastTimestep(DictModel):

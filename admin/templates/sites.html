@@ -38,7 +38,7 @@ Update all : <a href="/admin/forecast/update?redirect">forecasts</a> |
         $('table.sites a.forecast').click(function(e){
             var id = $(this).attr("data-id");
             $.ajax({
-                url:"/admin/forecast/" + id + "/update",
+                url:"/admin/sites/" + id + "/forecast/update",
                 type:'POST',
                 success:function(){
                     alert("Done");
