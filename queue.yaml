@@ -2,4 +2,5 @@ queue:
 - name: default
   rate: 5/s
 - name: update
-  rate: 1/s
+  rate: 5/s
+  max_concurrent_requests: 3
