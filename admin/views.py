@@ -5,12 +5,12 @@ from flask import Response, render_template, redirect, request
 from flask.helpers import url_for, flash
 
 from admin   import app
-from models import Site, ForecastTimestep, ObservationTimestep, ForecastDay, ObservationDay, make_key_name, Weather, Observations, Forecast
+from models import Site, ForecastTimestep, ObservationTimestep, ForecastDay, ObservationDay, make_key_name, Weather, Observations, Forecast, Forecasts
 
 import simplejson as json
 import logging
 from utils import chunks, snake_case, parse_yyyy_mm_dd_date
-from datetime import datetime
+from datetime import datetime, date
 from lib.iso8601 import parse_date
 
 @app.route('/admin')
@@ -170,8 +170,8 @@ def forecast_update(site_key):
         for date, day in days(forecast):
             forecast_day = ForecastDay.get_by_key_name(make_key_name(site,date))
             if forecast_day is None:
-                forecast_day = ForecastDay(key_name=make_key_name(site,date), forecast_date = date)
-
+                forecast_day = ForecastDay(key_name=make_key_name(site,date), forecast_date = date, site = site)
+            forecast_day.site = site
             for timestep, data in day_timesteps(day):
                 w = Forecast()
                 w.issued = issued_date
@@ -270,5 +270,46 @@ def observation_update2(site_key):
 
                 obs_timestep.save()
             #logging.info("%s, %s" % (str(date), str(ObservationTimestep)))
+
+    return Response(status = 204)
+
+
+@app.route('/admin/sites/<site_id>/observation/import', methods = ['post'])
+def observation_import(site_id):
+    site = Site.get_by_key_name(site_id)
+    if site is None:
+        return Response(status = 404)
+    today = date.today()
+    url = "http://metofficewatch.appspot.com/sites/%s/observations?day=%s" % (site_id, today.isoformat())
+
+    result = urlfetch.fetch(url)
+
+    if result.status_code == 200:
+        obs = json.loads(result.content)
+        obs_day = ObservationDay.get_by(site, today, not_found_return_new = True)
+        obs_day.observations = Observations.from_json(obs['observations'])
+        obs_day.lastdata_datetime = parse_date(obs['lastdata_datetime'])
+
+        obs_day.save()
+
+    return Response(status = 204)
+
+@app.route('/admin/sites/<site_id>/forecast/import', methods = ['post'])
+def forecast_import(site_id):
+    site = Site.get_by_key_name(site_id)
+    if site is None:
+        return Response(status = 404)
+    today = date.today()
+    url = "http://metofficewatch.appspot.com/sites/%s/forecasts?day=%s" % (site_id, today.isoformat())
+
+    result = urlfetch.fetch(url)
+
+    if result.status_code == 200:
+        forecasts = json.loads(result.content)
+        forecast_day = ForecastDay.get_by(site, today, not_found_return_new = True)
+        forecast_day.forecasts = Forecasts.from_json(forecasts['forecasts'])
+        forecast_day.lastdata_datetime = parse_date(forecasts['lastdata_datetime']) if forecasts['lastdata_datetime'] is not None else None
+
+        forecast_day.save()
 
     return Response(status = 204)

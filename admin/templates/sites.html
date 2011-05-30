@@ -22,8 +22,11 @@ Update all : <a href="/admin/forecast/update?redirect">forecasts</a> |
         <td>{{site.name}}</td>
         <td>{{site.location}}</td>
         <td>
-            <a href="#forecast" data-id="{{site.key().id_or_name()}}" class="forecast">forecast</a> |
-            <a href="#observations" data-id="{{site.key().id_or_name()}}" class="observation">observations</a>
+            <a href="#forecast" data-id="{{site.key().id_or_name()}}" class="forecast">forecast</a> <img src="/images/loader-small.gif" class="loader" style="display:none;"/> |
+            <a href="#observations" data-id="{{site.key().id_or_name()}}" class="observation">observations</a> <img src="/images/loader-small.gif" class="loader" style="display:none;"/> |
+            import :
+            <a href="#import" data-id="{{site.key().id_or_name()}}" class="import-forecast">forecasts</a> <img src="/images/loader-small.gif" class="loader" style="display:none;"/> |
+            <a href="#import" data-id="{{site.key().id_or_name()}}" class="import-observation">observation</a> <img src="/images/loader-small.gif" class="loader" style="display:none;"/>
         </td>
     </tr>
     {% endfor %}
@@ -37,22 +40,58 @@ Update all : <a href="/admin/forecast/update?redirect">forecasts</a> |
     $(function(){
         $('table.sites a.forecast').click(function(e){
             var id = $(this).attr("data-id");
+            var loader = $(this).next('.loader');
+            loader.show();
             $.ajax({
                 url:"/admin/sites/" + id + "/forecast/update",
                 type:'POST',
-                success:function(){
-                    alert("Done");
+                complete:function(){
+                    loader.hide();
                 }
             });
             e.preventDefault();
         });
         $('table.sites a.observation').click(function(e){
             var id = $(this).attr("data-id");
+            var loader = $(this).next('.loader');
+            loader.show();
             $.ajax({
                 url:"/admin/sites/" + id + "/observation/update",
                 type:'POST',
-                success:function(){
-                    alert("Done");
+                complete:function(){
+                    loader.hide();
+                }
+            });
+            e.preventDefault();
+        });
+        $('table.sites a.import-observation').click(function(e){
+            var id = $(this).attr("data-id");
+            var loader = $(this).next('.loader');
+            loader.show();
+            $.ajax({
+                url:"/admin/sites/" + id + "/observation/import",
+                type:'POST',
+                complete:function(){
+                    loader.hide();
+                },
+                error:function(xhr,error, httpMessage){
+                    alert('Error:' + error);
+                }
+            });
+            e.preventDefault();
+        });
+        $('table.sites a.import-forecast').click(function(e){
+            var id = $(this).attr("data-id");
+            var loader = $(this).next('.loader');
+            loader.show();
+            $.ajax({
+                url:"/admin/sites/" + id + "/forecast/import",
+                type:'POST',
+                complete:function(){
+                    loader.hide();
+                },
+                error:function(xhr,error, httpMessage){
+                    alert('Error:' + error);
                 }
             });
             e.preventDefault();

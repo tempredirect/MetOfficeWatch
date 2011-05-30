@@ -1,16 +1,11 @@
-from functools import wraps
 import dataccess
 from flask import Response, render_template, redirect, redirect, request
-from models import Site, ObservationTimestep, Forecast, ForecastTimestep
+from models import Site, ObservationTimestep, Forecast, ForecastTimestep, ForecastDay, make_key_name, ObservationDay
 from utils import first, last, parse_yyyy_mm_dd_date
 
 from webapp import app
 import simplejson as json
-from google.appengine.api import users
-from google.appengine.ext import db
 from datetime import date
-from lib.iso8601 import parse_date
-import logging
 
 def to_dict(obj):
     return obj.to_dict()
@@ -22,10 +17,55 @@ def json_response(value):
     dict_value = value if isinstance(value, dict) else value.to_dict()
     return Response(json.dumps(dict_value), content_type = 'application/json')
 
-
 @app.route('/sites')
 def sites():
     return json_list_response(Site.all().fetch(limit = 200))
+
+@app.route('/sites/<site_id>')
+def site_by_id(site_id):
+    site = Site.get_by_key_name(site_id)
+    if site is None:
+        return Response(status = 404)
+    return json_response(site)
+
+@app.route('/sites/<site_id>/forecasts')
+def site_forecasts(site_id):
+    site = Site.get_by_key_name(site_id)
+    if site is None:
+        return Response(status = 404)
+
+    if request.args.has_key('day'):
+        p = request.args.get('day')
+        day = parse_yyyy_mm_dd_date(p)
+    else:
+        return Response("day query parameter is required",status = 400)
+
+    forecast_day = ForecastDay.get_by_key_name(make_key_name(site,day))
+
+    if forecast_day is None:
+        return Response(status = 404)
+
+    return json_response(forecast_day)
+
+@app.route('/sites/<site_id>/observations')
+def site_observations(site_id):
+    site = Site.get_by_key_name(site_id)
+    if site is None:
+        return Response(status = 404)
+
+    if request.args.has_key('day'):
+        p = request.args.get('day')
+        day = parse_yyyy_mm_dd_date(p)
+    else:
+        return Response("day query parameter is required",status = 400)
+
+    observation_day = ObservationDay.get_by_key_name(make_key_name(site,day))
+
+    if observation_day is None:
+        return Response(status = 404)
+
+    return json_response(observation_day)
+
 
 @app.route('/sites/<site_id>/latest')
 def site_latest(site_id):

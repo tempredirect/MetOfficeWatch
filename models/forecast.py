@@ -2,7 +2,7 @@ from datetime import datetime
 from google.appengine.ext import db
 from jsonproperty import JsonMixin, JsonProperty
 from lib.iso8601 import parse_date
-from models import DictModel, Site, jsonvalue, Weather
+from models import DictModel, Site, jsonvalue, Weather, make_key_name
 from utils import SparseList
 
 def forecast_range(forecast, issued):
@@ -107,6 +107,15 @@ class ForecastDay(DictModel):
     forecast_date = db.DateProperty()
     lastdata_datetime = db.DateTimeProperty()
     forecasts = JsonProperty(Forecasts, default=Forecasts())
+
+    @classmethod
+    def get_by(cls, site, date, not_found_return_new = False):
+        r =  ForecastDay.get_by_key_name(make_key_name(site,date))
+        if r is None and not_found_return_new:
+            r = ForecastDay(key_name=make_key_name(site,date),
+                            site = site,
+                            forecast_date = date)
+        return r
 
 
 class ForecastTimestep(DictModel):

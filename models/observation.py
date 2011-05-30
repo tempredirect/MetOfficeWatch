@@ -1,7 +1,7 @@
 from datetime import datetime
 from google.appengine.ext import db
 from jsonproperty import JsonMixin, JsonProperty
-from models import Weather, DictModel, Site
+from models import Weather, DictModel, Site, make_key_name
 
 class Observations(JsonMixin):
     def __init__(self):
@@ -31,6 +31,12 @@ class ObservationDay(DictModel):
     lastdata_datetime = db.DateTimeProperty()
     observations = JsonProperty(Observations, default=Observations())
 
+    @classmethod
+    def get_by(cls, site, date, not_found_return_new = False):
+        r =  ObservationDay.get_by_key_name(make_key_name(site,date))
+        if r is None and not_found_return_new:
+            r = ObservationDay(key_name=make_key_name(site,date), site = site, observation_date = date)
+        return r
 
 class ObservationTimestep(DictModel):
     site = db.ReferenceProperty(reference_class=Site)

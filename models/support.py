@@ -7,6 +7,9 @@ from lib.iso8601 import parse_date
 SIMPLE_TYPES = (int, long, float, bool, dict, basestring, list)
 
 def make_key_name(site, reference_date):
+    """
+        Create a key based on the site and date
+    """
     return "%s/%s" % (site.key().name(),reference_date.isoformat())
 
 def jsonvalue(value):
