@@ -1,3 +1,4 @@
+from datetime import datetime
 from google.appengine.ext import db
 from jsonproperty import JsonMixin, JsonProperty
 from models import Weather, DictModel, Site
@@ -6,8 +7,10 @@ class Observations(JsonMixin):
     def __init__(self):
         self.observations = {}
 
-    def add(self, observation_datetime, weather):
-        self.observations[observation_datetime.time().isoformat()] = weather
+    def add(self, obs_time, weather):
+        if  isinstance(obs_time,datetime):
+            obs_time = obs_time.time().isoformat()
+        self.observations[obs_time] = weather
 
     def to_json(self):
         result = {}
